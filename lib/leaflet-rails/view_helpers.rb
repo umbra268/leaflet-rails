@@ -3,10 +3,10 @@ module Leaflet
   module ViewHelpers
 
     def map(options)
-      options[:tile_layer] ||= Leaflet.tile_layer
-      options[:attribution] ||= Leaflet.attribution
-      options[:max_zoom] ||= Leaflet.max_zoom
-      options[:subdomains] ||= Leaflet.subdomains
+      # options[:tile_layer] ||= Leaflet.tile_layer
+      # options[:attribution] ||= Leaflet.attribution
+      # options[:max_zoom] ||= Leaflet.max_zoom
+      # options[:subdomains] ||= Leaflet.subdomains
       options[:container_id] ||= 'map'
 
       tile_layer = options.delete(:tile_layer) || Leaflet.tile_layer
@@ -19,6 +19,8 @@ module Leaflet
       circles = options.delete(:circles)
       polylines = options.delete(:polylines)
       fitbounds = options.delete(:fitbounds)
+
+      tile_layers = options.delete(:tile_layers)
 
 
       output = []
@@ -38,7 +40,7 @@ module Leaflet
             output << "marker = L.marker([#{marker[:latlng][0]}, #{marker[:latlng][1]}], {icon: #{icon_settings[:name]}#{index}}).addTo(map)"
           else
             output << "marker = L.marker([#{marker[:latlng][0]}, #{marker[:latlng][1]}]).addTo(map)"
-          end          
+          end
           if marker[:popup]
             output << "marker.bindPopup('#{marker[:popup]}')"
           end
@@ -56,22 +58,36 @@ module Leaflet
       end
 
       if polylines
-         polylines.each do |polyline|
-           _output = "L.polyline(#{polyline[:latlngs]}"
-           _output << "," + polyline[:options].to_json if polyline[:options]
-           _output << ").addTo(map);"
-           output << _output.gsub(/\n/,'')
-         end
+        polylines.each do |polyline|
+          _output = "L.polyline(#{polyline[:latlngs]}"
+          _output << "," + polyline[:options].to_json if polyline[:options]
+          _output << ").addTo(map);"
+          output << _output.gsub(/\n/,'')
+        end
       end
 
       if fitbounds
         output << "map.fitBounds(L.latLngBounds(#{fitbounds}));"
       end
 
+      if tile_layers
+        tile_layers.each do |tile_layer|
+          _output << "L.tileLayer('#{tile_layer[:url]}', {
+          attribution: '#{tile_layer[:attrib]}',
+          maxZoom: #{tile_layer[:max_zoom]}"
+          if tile_layer[:subdomains]
+            _output << ",
+            subdomains: #{options[:subdomains]}"
+          end
+          _output << "}).addTo(map)"
+          output << _output.gsub(/\n/,'')
+        end
+      end
+
       output << "L.tileLayer('#{tile_layer}', {
           attribution: '#{attribution}',
           maxZoom: #{max_zoom},"
-      
+
       if options[:subdomains]
         output << "    subdomains: #{options[:subdomains]},"
         options.delete( :subdomains )

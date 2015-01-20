@@ -2,10 +2,10 @@ require "leaflet-rails/version"
 require "leaflet-rails/view_helpers"
 
 module Leaflet
-  mattr_accessor :tile_layer
-  mattr_accessor :attribution
-  mattr_accessor :max_zoom
-  mattr_accessor :subdomains
+  # mattr_accessor :tile_layer
+  # mattr_accessor :attribution
+  # mattr_accessor :max_zoom
+  # mattr_accessor :subdomains
   
   module Rails
     class Engine < ::Rails::Engine
