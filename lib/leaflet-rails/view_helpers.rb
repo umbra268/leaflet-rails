@@ -9,9 +9,9 @@ module Leaflet
       # options[:subdomains] ||= Leaflet.subdomains
       options[:container_id] ||= 'map'
 
-      tile_layer = options.delete(:tile_layer) || Leaflet.tile_layer
-      attribution = options.delete(:attribution) || Leaflet.attribution
-      max_zoom = options.delete(:max_zoom) || Leaflet.max_zoom
+      # tile_layer = options.delete(:tile_layer) || Leaflet.tile_layer
+      # attribution = options.delete(:attribution) || Leaflet.attribution
+      # max_zoom = options.delete(:max_zoom) || Leaflet.max_zoom
       container_id = options.delete(:container_id) || 'map'
       no_container = options.delete(:no_container)
       center = options.delete(:center)
