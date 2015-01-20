@@ -72,7 +72,7 @@ module Leaflet
 
       if tile_layers
         tile_layers.each do |tile_layer|
-          _output << "L.tileLayer('#{tile_layer[:url]}', {
+          _output = "L.tileLayer('#{tile_layer[:url]}', {
           attribution: '#{tile_layer[:attrib]}',
           maxZoom: #{tile_layer[:max_zoom]}"
           if tile_layer[:subdomains]
