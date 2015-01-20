@@ -77,7 +77,7 @@ module Leaflet
           maxZoom: #{tile_layer[:max_zoom]}"
           if tile_layer[:subdomains]
             _output << ",
-            subdomains: #{options[:subdomains]}"
+            subdomains: #{tile_layer[:subdomains]}"
           end
           _output << "}).addTo(map)"
           output << _output#.gsub(/\n/,'')
