@@ -80,7 +80,7 @@ module Leaflet
             subdomains: #{options[:subdomains]}"
           end
           _output << "}).addTo(map)"
-          output << _output.gsub(/\n/,'')
+          output << _output#.gsub(/\n/,'')
         end
       end
 
