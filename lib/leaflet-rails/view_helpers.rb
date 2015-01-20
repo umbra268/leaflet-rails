@@ -84,19 +84,19 @@ module Leaflet
         end
       end
 
-      output << "L.tileLayer('#{tile_layer}', {
-          attribution: '#{attribution}',
-          maxZoom: #{max_zoom},"
+      # output << "L.tileLayer('#{tile_layer}', {
+      #     attribution: '#{attribution}',
+      #     maxZoom: #{max_zoom},"
 
-      if options[:subdomains]
-        output << "    subdomains: #{options[:subdomains]},"
-        options.delete( :subdomains )
-      end
+      # if options[:subdomains]
+      #   output << "    subdomains: #{options[:subdomains]},"
+      #   options.delete( :subdomains )
+      # end
 
-      options.each do |key, value|
-        output << "#{key.to_s.camelize(:lower)}: '#{value}',"
-      end
-      output << "}).addTo(map)"
+      # options.each do |key, value|
+      #   output << "#{key.to_s.camelize(:lower)}: '#{value}',"
+      # end
+      # output << "}).addTo(map)"
 
       output << "</script>"
       output.join("\n").html_safe
