@@ -93,7 +93,7 @@ module Leaflet
       output << "var overlaymaps = {"
       base_maps.each_with_index do |layer,index|
         #each layer should have a url
-        output << '"#{layer[:name]}": overlay_map#{index}'
+        output << "'#{layer[:name]}': overlay_map#{index}"
         if(index!=overlay_maps.length-1)
           output << ","
         end
