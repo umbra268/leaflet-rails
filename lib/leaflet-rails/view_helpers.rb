@@ -57,7 +57,7 @@ module Leaflet
       output << "var basemaps = {"
       base_maps.each_with_index do |layer,index|
         #each layer should have a url
-        output << '"#{layer[:name]}": base_map#{index}'
+        output << "'#{layer[:name]}': base_map#{index}"
         if(index!=base_maps.length-1) 
           output << ","
         end
