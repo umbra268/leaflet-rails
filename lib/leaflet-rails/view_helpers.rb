@@ -24,7 +24,7 @@ module Leaflet
 
 
       output = []
-      output << "<div id='#{container_id}'></div>" unless no_container
+      output << "<div id='#{container_id}' style='height: 100%;'></div>" unless no_container
       output << "<script>"
       output << "var map = L.map('#{container_id}')"
 
