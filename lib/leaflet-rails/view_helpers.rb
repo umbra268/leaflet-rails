@@ -57,7 +57,9 @@ module Leaflet
       base_maps.each_with_index do |layer,index|
         #each layer should have a url
         output << '"#{layer[:name]}": base_map#{index}'
-        if(index!=base_maps.length-1) output << ","
+        if(index!=base_maps.length-1) 
+          output << ","
+        end
         output << '\n'
       end
       output << '};\n\n'
@@ -87,7 +89,9 @@ module Leaflet
       base_maps.each_with_index do |layer,index|
         #each layer should have a url
         output << '"#{layer[:name]}": overlay_map#{index}'
-        if(index!=overlay_maps.length-1) output << ","
+        if(index!=overlay_maps.length-1)
+          output << ","
+        end
         output << '\n'
       end
       output << '};\n\n'
