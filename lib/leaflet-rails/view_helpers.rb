@@ -3,6 +3,9 @@ module Leaflet
   module ViewHelpers
 
     def map(options)
+
+      options[:base_maps] ||= Leaflet.base_maps
+      options[:overlay_maps] ||= Leaflet.overlay_maps
       # options[:tile_layer] ||= Leaflet.tile_layer
       # options[:attribution] ||= Leaflet.attribution
       # options[:max_zoom] ||= Leaflet.max_zoom
@@ -20,13 +23,78 @@ module Leaflet
       polylines = options.delete(:polylines)
       fitbounds = options.delete(:fitbounds)
 
-      tile_layers = options.delete(:tile_layers)
+      base_maps = options.delete(:base_maps)
+      overlay_maps = options.delete(:overlay_maps)
 
 
       output = []
       output << "<div id='#{container_id}' style='height: 100%;'></div>" unless no_container
       output << "<script>"
+
+      base_maps.each_with_index do |layer,index|
+        #each layer should have a url
+        _output = "var base_map#{index} = L.tileLayer('layer[:url]',{"
+        #each layer might have max_zoom & subdomians & attribution
+        if layer[:attrib]
+          _output << "attribution: '#{layer[:attrib]}'"
+          if layer[:max_zoom] || layer[:subdomains]
+            _output << ","
+          end
+        end
+        if layer[:max_zoom]
+          _output << "maxZoom: '#{layer[:max_zoom]}'"
+          if layer[:subdomains]
+            _output << ","
+          end
+        end
+        if layer[:subdomains]
+          _output << "subdomains: #{layer[:subdomains]}'"
+        end
+        _output << "});"
+        output << _output+'\n'
+      end
+      output << "var basemaps = {"
+      base_maps.each_with_index do |layer,index|
+        #each layer should have a url
+        output << '"#{layer[:name]}": base_map#{index}'
+        if(index!=base_maps.length-1) output << ","
+        output << '\n'
+      end
+      output << '};\n\n'
+      overlay_maps.each_with_index do |layer,index|
+        #each layer should have a url
+        _output = "var overlay_map#{index} = L.tileLayer('layer[:url]',{"
+        #each layer might have max_zoom & subdomians & attribution
+        if layer[:attrib]
+          _output << "attribution: '#{layer[:attrib]}'"
+          if layer[:max_zoom] || layer[:subdomains]
+            _output << ","
+          end
+        end
+        if layer[:max_zoom]
+          _output << "maxZoom: '#{layer[:max_zoom]}'"
+          if layer[:subdomains]
+            _output << ","
+          end
+        end
+        if layer[:subdomains]
+          _output << "subdomains: #{layer[:subdomains]}'"
+        end
+        _output << "});"
+        output << _output+'\n'
+      end
+      output << "var overlaymaps = {"
+      base_maps.each_with_index do |layer,index|
+        #each layer should have a url
+        output << '"#{layer[:name]}": overlay_map#{index}'
+        if(index!=overlay_maps.length-1) output << ","
+        output << '\n'
+      end
+      output << '};\n\n'
+
       output << "var map = L.map('#{container_id}')"
+      output << "base_map0.addTo(map);"
+      output << "L.control.layers(basemaps, overlaymaps).addTo(map);"
 
       if center
         output << "map.setView([#{center[:latlng][0]}, #{center[:latlng][1]}], #{center[:zoom]})"
@@ -70,19 +138,19 @@ module Leaflet
         output << "map.fitBounds(L.latLngBounds(#{fitbounds}));"
       end
 
-      if tile_layers
-        tile_layers.each do |tile_layer|
-          _output = "L.tileLayer('#{tile_layer[:url]}', {
-          attribution: '#{tile_layer[:attrib]}',
-          maxZoom: #{tile_layer[:max_zoom]}"
-          if tile_layer[:subdomains]
-            _output << ",
-            subdomains: #{tile_layer[:subdomains]}"
-          end
-          _output << "}).addTo(map)"
-          output << _output#.gsub(/\n/,'')
-        end
-      end
+      # if tile_layers
+      #   tile_layers.each do |tile_layer|
+      #     _output = "L.tileLayer('#{tile_layer[:url]}', {
+      #     attribution: '#{tile_layer[:attrib]}',
+      #     maxZoom: #{tile_layer[:max_zoom]}"
+      #     if tile_layer[:subdomains]
+      #       _output << ",
+      #       subdomains: #{tile_layer[:subdomains]}"
+      #     end
+      #     _output << "}).addTo(map)"
+      #     output << _output#.gsub(/\n/,'')
+      #   end
+      # end
 
       # output << "L.tileLayer('#{tile_layer}', {
       #     attribution: '#{attribution}',
