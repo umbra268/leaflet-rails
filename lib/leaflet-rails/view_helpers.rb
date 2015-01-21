@@ -33,7 +33,7 @@ module Leaflet
 
       base_maps.each_with_index do |layer,index|
         #each layer should have a url
-        _output = "var base_map#{index} = L.tileLayer('layer[:url]',{"
+        _output = "var base_map#{index} = L.tileLayer(#{'layer[:url]'},{"
         #each layer might have max_zoom & subdomians & attribution
         if layer[:attrib]
           _output << "attribution: '#{layer[:attrib]}'"
@@ -69,7 +69,7 @@ module Leaflet
       '
       overlay_maps.each_with_index do |layer,index|
         #each layer should have a url
-        _output = "var overlay_map#{index} = L.tileLayer('layer[:url]',{"
+        _output = "var overlay_map#{index} = L.tileLayer(#{'layer[:url]'},{"
         #each layer might have max_zoom & subdomians & attribution
         if layer[:attrib]
           _output << "attribution: '#{layer[:attrib]}'"
