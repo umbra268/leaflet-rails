@@ -48,7 +48,7 @@ module Leaflet
           end
         end
         if layer[:subdomains]
-          _output << "subdomains: #{layer[:subdomains]}'"
+          _output << "subdomains: #{layer[:subdomains]}"
         end
         _output << "});"
         output << _output+'
@@ -84,7 +84,7 @@ module Leaflet
           end
         end
         if layer[:subdomains]
-          _output << "subdomains: #{layer[:subdomains]}'"
+          _output << "subdomains: #{layer[:subdomains]}"
         end
         _output << "});"
         output << _output+'
