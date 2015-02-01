@@ -150,7 +150,7 @@ module Leaflet
         polygons.each do |polygon|
           _output = "L.polygon(#{polygon[:latlngs]}"
           _output << "," + polygon[:options].to_json if polygon[:options]
-          _output << ").addTo(map);"
+          _output << ",{className:'polygon'}).addTo(map);"
           output << _output.gsub(/\n/,'')
         end
       end
