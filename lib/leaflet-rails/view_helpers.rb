@@ -107,7 +107,8 @@ module Leaflet
 
       output << "var map = L.map('#{container_id}')"
       output << "base_map0.addTo(map);"
-      output << "L.control.selectLayers(basemaps, overlaymaps).addTo(map);"
+      output << "var control = L.control.selectLayers(basemaps, overlaymaps);"
+      output << "control.addTo(map);"
 
       if center
         output << "map.setView([#{center[:latlng][0]}, #{center[:latlng][1]}], #{center[:zoom]})"
