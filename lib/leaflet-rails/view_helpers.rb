@@ -21,6 +21,7 @@ module Leaflet
       markers = options.delete(:markers)
       circles = options.delete(:circles)
       polylines = options.delete(:polylines)
+      polygons = options.delete(:polygons)
       fitbounds = options.delete(:fitbounds)
 
       base_maps = options.delete(:base_maps)
@@ -58,7 +59,7 @@ module Leaflet
       base_maps.each_with_index do |layer,index|
         #each layer should have a url
         output << "'#{layer[:name]}': base_map#{index}"
-        if(index!=base_maps.length-1) 
+        if(index!=base_maps.length-1)
           output << ","
         end
         output << '
@@ -141,6 +142,14 @@ module Leaflet
         polylines.each do |polyline|
           _output = "L.polyline(#{polyline[:latlngs]}"
           _output << "," + polyline[:options].to_json if polyline[:options]
+          _output << ").addTo(map);"
+          output << _output.gsub(/\n/,'')
+        end
+      end
+      if polygons
+        polygons.each do |polygon|
+          _output = "L.polygon(#{polygon[:latlngs]}"
+          _output << "," + polygon[:options].to_json if polygon[:options]
           _output << ").addTo(map);"
           output << _output.gsub(/\n/,'')
         end
