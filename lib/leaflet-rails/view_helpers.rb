@@ -142,7 +142,7 @@ module Leaflet
         polylines.each do |polyline|
           _output = "L.polyline(#{polyline[:latlngs]}"
           _output << "," + polyline[:options].to_json if polyline[:options]
-          _output << ").addTo(map);"
+          _output << ",{class:'polyline'}).addTo(map);"
           output << _output.gsub(/\n/,'')
         end
       end
