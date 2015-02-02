@@ -26,6 +26,7 @@ module Leaflet
 
       base_maps = options.delete(:base_maps)
       overlay_maps = options.delete(:overlay_maps)
+      shape_layers = options.delete(:shape_layers)
 
 
       output = []
@@ -91,15 +92,48 @@ module Leaflet
         output << _output+'
         '
       end
+
+
+
+
+      if shape_layers
+        shape_layers.each do |layer|
+          name = layer[:name].gsub(/ /,'_').downcase
+          _output = "";
+          if layer[:polylines]
+            layer[:polylines].each_with_index do |polyline, index|
+              _output << "," if index!=0
+              _output << "L.polyline(#{polyline[:latlngs]}"
+              _output << "," + polyline[:options].to_json if polyline[:options]
+              _output << ",{className:'#{name}'})"
+            end
+          end
+          if layer[:polygons]
+            layer[:polygons].each_with_index do |polygon, index|
+              _output << "," if index!=0 || (index==0 && layer[:polylines])
+              _output << "L.polygon(#{polygon[:latlngs]}"
+              _output << "," + polygon[:options].to_json if polygon[:options]
+              _output << ",{className:'#{name}'})"
+            end
+          end
+          output << "var #{name} = L.layerGroup([#{_output.gsub(/\n/,' ')}]);"
+        end
+      end
+
+
+
       output << "var overlaymaps = {"
       overlay_maps.each_with_index do |layer,index|
+        output << "," if index!=0
         #each layer should have a url
         output << "'#{layer[:name]}': overlay_map#{index}"
-        if(index!=overlay_maps.length-1)
-          output << ","
+      end
+      if shape_layers
+        shape_layers.each_with_index do |layer,index|
+          name = layer[:name].gsub(/ /,'_').downcase
+          output << "," if index!=0 || (index==0 && overlay_maps)
+          output << "'#{layer[:name]}': #{name}"
         end
-        output << '
-        '
       end
       output << '};
 
