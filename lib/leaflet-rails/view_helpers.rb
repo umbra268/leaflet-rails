@@ -144,6 +144,13 @@ module Leaflet
       output << "var control = L.control.selectLayers(basemaps, overlaymaps);"
       output << "control.addTo(map);"
 
+      if shape_layers
+        shape_layers.each do |layer|
+          name = layer[:name].gsub(/ /,'_').downcase
+          output << "#{name}.addTo(map);"
+        end
+      end
+
       if center
         output << "map.setView([#{center[:latlng][0]}, #{center[:latlng][1]}], #{center[:zoom]})"
       end
