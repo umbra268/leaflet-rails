@@ -32,72 +32,70 @@ module Leaflet
       output = []
       output << "<div id='#{container_id}' style='height: 100%;'></div>" unless no_container
       output << "<script>"
+      output << "var map = L.map('#{container_id}')"
+      if center
+        output << "map.setView([#{center[:latlng][0]}, #{center[:latlng][1]}], #{center[:zoom]})"
+      end
+      output << "layerC = L.control.panelLayers(["
 
       base_maps.each_with_index do |layer,index|
+        output << "," if index!=0
+        output << "{
+        name: '#{layer[:name]}',"
+        output << "active: true," if index==0
+        output << "icon: '#{layer[:icon]}'," if layer[:icon]
+        output << "layer: L.tileLayer('#{layer[:url]}',{"
         #each layer should have a url
-        _output = "var base_map#{index} = L.tileLayer('#{layer[:url]}',{"
         #each layer might have max_zoom & subdomians & attribution
         if layer[:attrib]
-          _output << "attribution: '#{layer[:attrib]}'"
+          output << "attribution: '#{layer[:attrib]}'"
           if layer[:max_zoom] || layer[:subdomains]
-            _output << ","
+            output << ","
           end
         end
         if layer[:max_zoom]
-          _output << "maxZoom: '#{layer[:max_zoom]}'"
+          output << "maxZoom: '#{layer[:max_zoom]}'"
           if layer[:subdomains]
-            _output << ","
+            output << ","
           end
         end
         if layer[:subdomains]
-          _output << "subdomains: #{layer[:subdomains]}"
+          output << "subdomains: #{layer[:subdomains]}"
         end
-        _output << "});"
-        output << _output+'
-        '
+        output << "})}"
       end
-      output << "var basemaps = {"
-      base_maps.each_with_index do |layer,index|
-        #each layer should have a url
-        output << "'#{layer[:name]}': base_map#{index}"
-        if(index!=base_maps.length-1)
-          output << ","
-        end
-        output << '
-        '
-      end
-      output << '};
-
-      '
+      output << "],["
       overlay_maps.each_with_index do |layer,index|
+        output << "," if index!=0
+        output << "{
+        name: '#{layer[:name]}',"
+        output << "icon: '#{layer[:icon]}'," if layer[:icon]
+        output << "layer: L.tileLayer('#{layer[:url]}',{"
         #each layer should have a url
-        _output = "var overlay_map#{index} = L.tileLayer('#{layer[:url]}',{"
         #each layer might have max_zoom & subdomians & attribution
         if layer[:attrib]
-          _output << "attribution: '#{layer[:attrib]}'"
+          output << "attribution: '#{layer[:attrib]}'"
           if layer[:max_zoom] || layer[:subdomains]
-            _output << ","
+            output << ","
           end
         end
         if layer[:max_zoom]
-          _output << "maxZoom: '#{layer[:max_zoom]}'"
+          output << "maxZoom: '#{layer[:max_zoom]}'"
           if layer[:subdomains]
-            _output << ","
+            output << ","
           end
         end
         if layer[:subdomains]
-          _output << "subdomains: #{layer[:subdomains]}"
+          output << "subdomains: #{layer[:subdomains]}"
         end
-        _output << "});"
-        output << _output+'
-        '
+        output << "})}"
       end
-
-
-
 
       if shape_layers
-        shape_layers.each do |layer|
+        output << ",{
+        group:'Data',
+        layers: ["
+        shape_layers.each_with_index do |layer, index|
           name = layer[:name].gsub(/ /,'_').downcase
           _output = "";
           if layer[:polylines]
@@ -116,44 +114,98 @@ module Leaflet
               _output << ",{className:'#{name}'})"
             end
           end
-          output << "var #{name} = L.layerGroup([#{_output.gsub(/\n/,' ')}]);"
+          output << "," if index!=0
+          output << "{name:'#{layer[:name]}', active:true,"
+          output << "icon: '#{layer[:icon]}'," if layer[:icon]
+          output << " layer:L.layerGroup([#{_output.gsub(/\n/,' ')}])}"
         end
+        output << "]}"
       end
 
 
 
-      output << "var overlaymaps = {"
-      overlay_maps.each_with_index do |layer,index|
-        output << "," if index!=0
-        #each layer should have a url
-        output << "'#{layer[:name]}': overlay_map#{index}"
-      end
-      if shape_layers
-        shape_layers.each_with_index do |layer,index|
-          name = layer[:name].gsub(/ /,'_').downcase
-          output << "," if index!=0 || (index==0 && overlay_maps)
-          output << "'#{layer[:name]}': #{name}"
-        end
-      end
-      output << '};
+      output << "],{collapsed:true}); map.addControl(layerC);"
+      # overlay_maps.each_with_index do |layer,index|
+      #   #each layer should have a url
+      #   _output = "var overlay_map#{index} = L.tileLayer('#{layer[:url]}',{"
+      #   #each layer might have max_zoom & subdomians & attribution
+      #   if layer[:attrib]
+      #     _output << "attribution: '#{layer[:attrib]}'"
+      #     if layer[:max_zoom] || layer[:subdomains]
+      #       _output << ","
+      #     end
+      #   end
+      #   if layer[:max_zoom]
+      #     _output << "maxZoom: '#{layer[:max_zoom]}'"
+      #     if layer[:subdomains]
+      #       _output << ","
+      #     end
+      #   end
+      #   if layer[:subdomains]
+      #     _output << "subdomains: #{layer[:subdomains]}"
+      #   end
+      #   _output << "});"
+      #   output << _output+'
+      #   '
+      # end
+      #
+      #
+      #
+      #
+      # if shape_layers
+      #   shape_layers.each do |layer|
+      #     name = layer[:name].gsub(/ /,'_').downcase
+      #     _output = "";
+      #     if layer[:polylines]
+      #       layer[:polylines].each_with_index do |polyline, index|
+      #         _output << "," if index!=0
+      #         _output << "L.polyline(#{polyline[:latlngs]}"
+      #         _output << "," + polyline[:options].to_json if polyline[:options]
+      #         _output << ",{className:'#{name}'})"
+      #       end
+      #     end
+      #     if layer[:polygons]
+      #       layer[:polygons].each_with_index do |polygon, index|
+      #         _output << "," if index!=0 || (index==0 && layer[:polylines])
+      #         _output << "L.polygon(#{polygon[:latlngs]}"
+      #         _output << "," + polygon[:options].to_json if polygon[:options]
+      #         _output << ",{className:'#{name}'})"
+      #       end
+      #     end
+      #     output << "var #{name} = L.layerGroup([#{_output.gsub(/\n/,' ')}]);"
+      #   end
+      # end
+      #
+      #
+      #
+      # output << "var overlaymaps = {"
+      # overlay_maps.each_with_index do |layer,index|
+      #   output << "," if index!=0
+      #   #each layer should have a url
+      #   output << "'#{layer[:name]}': overlay_map#{index}"
+      # end
+      # if shape_layers
+      #   shape_layers.each_with_index do |layer,index|
+      #     name = layer[:name].gsub(/ /,'_').downcase
+      #     output << "," if index!=0 || (index==0 && overlay_maps)
+      #     output << "'#{layer[:name]}': #{name}"
+      #   end
+      # end
+      # output << '};
+      #
+      # '
 
-      '
+      # output << "var map = L.map('#{container_id}')"
+      # output << "base_map0.addTo(map);"
+      # output << "var control = L.control.layers(basemaps, overlaymaps);"
+      # output << "control.addTo(map);"
 
-      output << "var map = L.map('#{container_id}')"
-      output << "base_map0.addTo(map);"
-      output << "var control = L.control.selectLayers(basemaps, overlaymaps);"
-      output << "control.addTo(map);"
-
-      if shape_layers
-        shape_layers.each do |layer|
-          name = layer[:name].gsub(/ /,'_').downcase
-          output << "#{name}.addTo(map);"
-        end
-      end
-
-      if center
-        output << "map.setView([#{center[:latlng][0]}, #{center[:latlng][1]}], #{center[:zoom]})"
-      end
+      # if shape_layers
+      #   shape_layers.each do |layer|
+      #     name = layer[:name].gsub(/ /,'_').downcase
+      #     output << "#{name}.addTo(map);"
+      #   end
+      # end
 
       if markers
         markers.each_with_index do |marker, index|
